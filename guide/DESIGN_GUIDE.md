@@ -1,4 +1,4 @@
-# sideshow — design guide for agents
+# shuvshow — design guide for agents
 
 You are drawing to a persistent visual surface the user keeps open in a browser.
 Your posts appear instantly as cards, grouped into a session for this
@@ -27,7 +27,7 @@ a `kind`:
   draw SVG by hand. The source travels as data and renders in a sandboxed Mermaid
   frame (securityLevel `strict`); for bespoke vector art hand-write inline `<svg>`
   in an `html` surface instead. Prefer vertical flowcharts (`flowchart TD`/`TB`)
-  for sideshow cards;
+  for shuvshow cards;
   wide `LR` system maps shrink to fit the card and become unreadable. The viewer
   themes the diagram (light and dark) automatically — **don't set your own
   colors**. Highlight flowchart nodes with `:::accent` (or `class A,B accent`)
@@ -143,7 +143,7 @@ Push a binary asset once, reference it by id. Three ways, same result:
 POST /api/assets   (raw)   Content-Type: image/png   <bytes>     ?filename=shot.png&kind=image&session=<id>
 POST /api/assets   (json)  { "data": "<base64>", "contentType": "image/png", "filename": "shot.png", "session": "<id>" }
 MCP  upload_asset  { data: "<base64>", contentType, filename?, kind?, session? }
-CLI  sideshow upload shot.png         # prints { id, url }
+CLI  shuvshow upload shot.png         # prints { id, url }
 ```
 
 The response carries `{ id, url }`. Then reference the asset three ways: as an
@@ -153,15 +153,15 @@ prose; or inside an html surface (`<img src="<url>">`) when you're drawing. Per-
 limit is 5 MB.
 
 An asset's **id is the SHA-256 of its bytes**, so the URL is content-addressed:
-derive it locally (`sideshow asset-url shot.png`, or `shasum -a 256`) and write
+derive it locally (`shuvshow asset-url shot.png`, or `shasum -a 256`) and write
 the `<img src="/a/<hash>">` or `assetId` into your post _before_ uploading —
 bytes can follow in any order and the viewer briefly waits for an in-flight asset
 rather than showing a broken image. Identical bytes dedupe to one blob, and an
 asset survives as long as any post references it (even across sessions).
 
-CLI shortcuts: `sideshow image shot.png --title "…"` (upload + publish in one
-shot), `sideshow trace run.json --title "…"`, `sideshow publish sketch.html
---image shot.png`, and `sideshow asset-url shot.png` (print the URL without
+CLI shortcuts: `shuvshow image shot.png --title "…"` (upload + publish in one
+shot), `shuvshow trace run.json --title "…"`, `shuvshow publish sketch.html
+--image shot.png`, and `shuvshow asset-url shot.png` (print the URL without
 uploading).
 
 ## Publishing
@@ -170,8 +170,8 @@ Via MCP tools (preferred): `publish_post`, `update_post`,
 `wait_for_feedback`, `reply_to_user`, `list_posts`. (`publish_surface` /
 `update_surface` remain as deprecated aliases; `publish_snippet` /
 `update_snippet` remain as html-only sugar aliases.) Via CLI:
-`sideshow publish file.html --title "..."`, `sideshow diff change.patch
---title "..."`, `sideshow wait`. Via raw HTTP:
+`shuvshow publish file.html --title "..."`, `shuvshow diff change.patch
+--title "..."`, `shuvshow wait`. Via raw HTTP:
 
 ```
 POST /api/posts          { "title": "...", "surfaces": [...], "session": "<id>", "agent": "your-name" }
@@ -198,15 +198,15 @@ POST /api/posts  { "title": "Retry flow", "surfaces": [
 CLI equivalents — one verb per kind, or compose with `--diff`:
 
 ```
-sideshow publish sketch.html --title "Cache layout"        # html
-sideshow markdown plan.md --title "Migration plan"         # markdown
-sideshow mermaid flow.mmd --title "Request flow"           # mermaid
-sideshow diff change.patch --layout split --title "..."    # diff
-sideshow json data.json --title "API response"             # json (collapsible tree)
-sideshow code app.ts --title "Entry point"                  # code (lang inferred from filename)
-sideshow code - --language python --title "Script"          # code from stdin
-sideshow code app.ts --line-start 80 --title "app.ts"       # excerpt with original line numbers
-sideshow publish sketch.html --diff change.patch --title "Retry flow"   # [html, diff]
+shuvshow publish sketch.html --title "Cache layout"        # html
+shuvshow markdown plan.md --title "Migration plan"         # markdown
+shuvshow mermaid flow.mmd --title "Request flow"           # mermaid
+shuvshow diff change.patch --layout split --title "..."    # diff
+shuvshow json data.json --title "API response"             # json (collapsible tree)
+shuvshow code app.ts --title "Entry point"                  # code (lang inferred from filename)
+shuvshow code - --language python --title "Script"          # code from stdin
+shuvshow code app.ts --line-start 80 --title "app.ts"       # excerpt with original line numbers
+shuvshow publish sketch.html --diff change.patch --title "Retry flow"   # [html, diff]
 ```
 
 Omit `session` on your first publish; the response's `sessionId` is yours —
@@ -225,15 +225,15 @@ The user can type comments under any post. Comments attach to a post
   `userFeedback` array — comments the user left since your last call. Treat
   them as messages from the user; they are delivered once. You never need to
   poll while you are actively publishing.
-- **Blocking wait.** `wait_for_feedback` (MCP), `sideshow wait` (CLI), or the
+- **Blocking wait.** `wait_for_feedback` (MCP), `shuvshow wait` (CLI), or the
   long-poll endpoint — use at a checkpoint when you explicitly want a reaction
   before continuing.
 - **Background watch.** If your harness supports background processes, arm
-  `sideshow wait --timeout 600` in the background after your first publish and
+  `shuvshow wait --timeout 600` in the background after your first publish and
   keep working; when it exits with comments, handle them and re-arm. Always arm
   it on the session you actually published to.
 
-You can answer in the thread with `reply_to_user` / `sideshow comment` — keep
+You can answer in the thread with `reply_to_user` / `shuvshow comment` — keep
 replies short; do substantial revisions as post updates instead.
 
 ## HTML contract
@@ -310,7 +310,7 @@ surface's `kits` and the sandbox doc gets that kit's CSS (and, for behavior kits
 JS) on top of the base — so you write compact class-based markup instead of
 hand-rolling styles. A plain html surface (no `kits`) is untouched: the vocabulary
 ships only when you ask, so default html stays fully freeform. Discover them
-with `sideshow kits` (or `GET /api/kits`). Every class resolves against the
+with `shuvshow kits` (or `GET /api/kits`). Every class resolves against the
 theme tokens, so kit output re-themes with the workspace.
 
 - **`issues`** — `.card` · nesting `.tree` rail · `.badge` (`.ok`/`.info`/`.warn`/`.danger`)
@@ -324,7 +324,7 @@ theme tokens, so kit output re-themes with the workspace.
   navigate.
 
 ```sh
-sideshow publish board.html --kit issues       # CLI (repeatable: --kit a --kit b)
+shuvshow publish board.html --kit issues       # CLI (repeatable: --kit a --kit b)
 ```
 
 ```js

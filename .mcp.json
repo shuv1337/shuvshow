@@ -1,6 +1,6 @@
 {
   "mcpServers": {
-    "sideshow": {
+    "shuvshow": {
       "command": "node",
       "args": ["mcp/server.ts"],
       "env": {

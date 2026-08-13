@@ -1,8 +1,8 @@
 import assert from "node:assert/strict";
 import { createHash } from "node:crypto";
 import { execFile, spawn, type ChildProcess } from "node:child_process";
-import { mkdtempSync, readFileSync, writeFileSync } from "node:fs";
-import { tmpdir } from "node:os";
+import { mkdirSync, mkdtempSync, readFileSync, writeFileSync } from "node:fs";
+import { tmpdir, userInfo } from "node:os";
 import { dirname, join } from "node:path";
 import { test } from "node:test";
 import { fileURLToPath } from "node:url";
@@ -87,14 +87,22 @@ for (const flag of ["--version", "-V", "version"]) {
   test(`${flag} prints the version`, async () => {
     const { code, stdout } = await run(...(flag.startsWith("-") ? [flag] : [flag]));
     assert.equal(code, 0);
-    assert.match(stdout, /^sideshow \d+\.\d+\.\d+/);
+    assert.match(stdout, /^shuvshow \d+\.\d+\.\d+/);
   });
 }
 
 test("version runs end-to-end (update check is best-effort)", async () => {
-  const { code, stdout } = await run("version");
+  const temp = mkdtempSync(join(tmpdir(), "shuvshow-version-"));
+  const cacheDir = join(temp, `shuvshow-${userInfo().username}`);
+  mkdirSync(cacheDir);
+  writeFileSync(
+    join(cacheDir, "update-check.json"),
+    JSON.stringify({ at: Date.now(), version: "999.0.0" }),
+  );
+  const { code, stdout } = await runWith({ env: { TMPDIR: temp } }, "version");
   assert.equal(code, 0);
-  assert.match(stdout, /^sideshow \d+\.\d+\.\d+/);
+  assert.match(stdout, /^shuvshow \d+\.\d+\.\d+/);
+  assert.match(stdout, /Update available/);
 });
 
 // None of these reach the network: --help and option errors resolve in
@@ -147,14 +155,14 @@ test("unknown command fails with a one-line hint", async () => {
   const { code, stdout, stderr } = await run("bogus-command");
   assert.equal(code, 1);
   assert.equal(stdout, "");
-  assert.match(stderr, /^sideshow: unknown command "bogus-command" — run "sideshow help"\n$/);
+  assert.match(stderr, /^shuvshow: unknown command "bogus-command" — run "shuvshow help"\n$/);
 });
 
 test("unknown option fails with a one-line error, not a stack trace", async () => {
   const { code, stdout, stderr } = await run("publish", "--bogus");
   assert.equal(code, 1);
   assert.equal(stdout, "");
-  assert.match(stderr, /^sideshow: Unknown option '--bogus' — run "sideshow help"\n$/);
+  assert.match(stderr, /^shuvshow: Unknown option '--bogus' — run "shuvshow help"\n$/);
 });
 
 test("missing option value fails with a one-line error, not a stack trace", async () => {
@@ -162,7 +170,7 @@ test("missing option value fails with a one-line error, not a stack trace", asyn
   assert.equal(code, 1);
   assert.match(
     stderr,
-    /^sideshow: Option '--title <value>' argument missing — run "sideshow help"\n$/,
+    /^shuvshow: Option '--title <value>' argument missing — run "shuvshow help"\n$/,
   );
 });
 
@@ -204,7 +212,7 @@ test("watch streams each new user comment as one line and re-arms", async () => 
       author: "user",
     });
     await waitFor(() => stdout.includes("tighten the spacing"));
-    assert.match(stdout, /sideshow comment on “Doc” \(post .+\): “tighten the spacing”/);
+    assert.match(stdout, /shuvshow comment on “Doc” \(post .+\): “tighten the spacing”/);
 
     // a second comment proves the loop re-armed (not a one-shot)
     await post(`${server.url}/api/comments`, {
@@ -213,7 +221,7 @@ test("watch streams each new user comment as one line and re-arms", async () => 
       author: "user",
     });
     await waitFor(() => stdout.includes("and ship it"));
-    assert.match(stdout, /sideshow comment on “Doc” \(post .+\): “and ship it”/);
+    assert.match(stdout, /shuvshow comment on “Doc” \(post .+\): “and ship it”/);
 
     // exactly-once: neither comment is repeated across the re-arming polls
     assert.equal(stdout.match(/tighten the spacing/g)?.length, 1);
@@ -295,13 +303,13 @@ test("kits lists the workspace's available kits", async () => {
   }
 });
 
-test("install-hook --print emits a Stop hook that runs `sideshow hook`", async () => {
+test("install-hook --print emits a Stop hook that runs the shuvshow hook", async () => {
   const { code, stdout } = await run("install-hook", "--print");
   assert.equal(code, 0);
   const cfg = JSON.parse(stdout);
   const cmd = cfg.hooks.Stop[0].hooks[0].command;
   assert.equal(cfg.hooks.Stop[0].hooks[0].type, "command");
-  assert.match(cmd, /sideshow(\.js)?["']?\s+hook\b/);
+  assert.match(cmd, /(?:shuvshow|sideshow)(\.js)?["']?\s+hook\b/);
 });
 
 test("install-hook merges into existing Stop hooks and is idempotent", async () => {
@@ -323,7 +331,10 @@ test("install-hook merges into existing Stop hooks and is idempotent", async () 
   assert.match(again.stdout, /already-installed/);
   cfg = JSON.parse(readFileSync(settings, "utf8"));
   const cmds = cfg.hooks.Stop.flatMap((g: any) => g.hooks.map((h: any) => h.command));
-  assert.equal(cmds.filter((c: string) => /sideshow(\.js)?["']?\s+hook\b/.test(c)).length, 1);
+  assert.equal(
+    cmds.filter((c: string) => /(?:shuvshow|sideshow)(\.js)?["']?\s+hook\b/.test(c)).length,
+    1,
+  );
   assert.ok(cmds.some((c: string) => c.includes("sideshow-stop-hook.mjs")));
 });
 
@@ -879,7 +890,7 @@ test("update without an id fails with a usage error", async () => {
   try {
     const { code, stderr } = await cli(server, "update");
     assert.notEqual(code, 0);
-    assert.match(stderr, /usage: sideshow update/);
+    assert.match(stderr, /usage: shuvshow update/);
   } finally {
     await server.close();
   }
@@ -1229,7 +1240,7 @@ test("show prints a single post with surface ids", async () => {
 test("show without an id fails with a usage error", async () => {
   const { code, stderr } = await run("show");
   assert.notEqual(code, 0);
-  assert.match(stderr, /usage: sideshow show/);
+  assert.match(stderr, /usage: shuvshow show/);
 });
 
 // --- assets (image / upload / asset-url) ----------------------------------
@@ -1304,12 +1315,12 @@ test("local file and usage errors fail before hitting the server", async () => {
   const missing = join(mkdtempSync(join(tmpdir(), "sideshow-missing-file-")), "missing.html");
   const cases: Array<[string[], RegExp]> = [
     [["publish", missing], /cannot read file/],
-    [["upload"], /usage: sideshow upload/],
-    [["asset-url"], /usage: sideshow asset-url/],
-    [["image"], /usage: sideshow image/],
-    [["json"], /usage: sideshow json/],
-    [["code"], /usage: sideshow code/],
-    [["trace"], /usage: sideshow trace/],
+    [["upload"], /usage: shuvshow upload/],
+    [["asset-url"], /usage: shuvshow asset-url/],
+    [["image"], /usage: shuvshow image/],
+    [["json"], /usage: shuvshow json/],
+    [["code"], /usage: shuvshow code/],
+    [["trace"], /usage: shuvshow trace/],
   ];
   for (const [args, pattern] of cases) {
     const { code, stdout, stderr } = await runWith(
@@ -1368,7 +1379,7 @@ test("an unreachable server fails with a one-line error, not a stack trace", asy
   );
   assert.notEqual(code, 0);
   assert.equal(stdout, "");
-  assert.match(stderr, /^sideshow: server not reachable/);
+  assert.match(stderr, /^shuvshow: server not reachable/);
 });
 
 test("a server error is surfaced as the server's error message", async () => {

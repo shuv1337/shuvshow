@@ -1,6 +1,6 @@
 {
   "$schema": "node_modules/wrangler/config-schema.json",
-  "name": "sideshow",
+  "name": "shuvshow",
   "main": "workers/index.ts",
   "compatibility_date": "2026-06-01",
   "rules": [{ "type": "Text", "globs": ["**/*.html", "**/*.md"], "fallthrough": true }],

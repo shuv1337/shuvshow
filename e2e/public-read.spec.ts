@@ -61,7 +61,7 @@ test("readonly session-mode viewer loads without fetching the session list", asy
 
     await page.goto(`${server.url}/session/${surface.sessionId}`);
 
-    await expect(page).toHaveTitle("Auth refactor · sideshow");
+    await expect(page).toHaveTitle("Auth refactor · shuvshow");
     await expect(page.locator(".card:not(#whatsNew)")).toBeVisible();
     await expect(page.locator(".card-title")).toContainText("Session scoped");
     expect(sessionListRequests).toEqual([]);
@@ -134,7 +134,7 @@ test("readonly session-mode viewer renders without sidebar chrome", async ({ pag
     await expect(page.locator("button.menu")).toHaveCount(0);
     await expect(page.locator("#scrim")).toHaveCount(0);
     await expect(page.locator("#onboard")).toHaveCount(0);
-    await expect(page.locator(".topbar .brand")).toContainText("sideshow");
+    await expect(page.locator(".topbar .brand")).toContainText("shuvshow");
     await expect(page.locator(".card:not(#whatsNew)")).toBeVisible();
   } finally {
     server.stop();

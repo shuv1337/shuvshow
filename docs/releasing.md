@@ -1,6 +1,6 @@
 # Releasing
 
-Sideshow follows the same tag-driven shape as Hunk:
+shuvshow follows the same tag-driven shape as Hunk:
 
 1. PRs carry Changesets release-note fragments.
 2. A release-prep commit consumes those fragments and bumps package versions.
@@ -14,7 +14,7 @@ For user-visible changes:
 npm run changeset
 ```
 
-Select `sideshow` and choose:
+Select `shuvshow` and choose:
 
 - `patch` for fixes and small behavior changes
 - `minor` for new user-facing features

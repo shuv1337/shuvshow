@@ -12,14 +12,14 @@ const TOKEN = process.env.SIDESHOW_TOKEN;
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), "..");
 const PKG_VERSION = JSON.parse(readFileSync(join(ROOT, "package.json"), "utf8")).version;
 // This script's own path — used to register the Stop hook so it works whether
-// or not `sideshow` is on PATH (a fresh clone, an npx run, a global install).
+// or not `shuvshow` is on PATH (a fresh clone, an npx run, a global install).
 const SELF = fileURLToPath(import.meta.url);
 
-const HELP = `sideshow — a live visual surface for terminal coding agents
+const HELP = `shuvshow — a live visual surface for terminal coding agents
 
 usage:
-  sideshow serve [--port N] [--open]      start the surface (API + viewer)
-  sideshow publish <file|-> [options]     publish an HTML post (one html surface)
+  shuvshow serve [--port N] [--open]      start the surface (API + viewer)
+  shuvshow publish <file|-> [options]     publish an HTML post (one html surface)
       --title <t>       post title
       --md <file|->     add a markdown surface (prose) — repeatable
       --mermaid <file|-> add a mermaid surface (diagram source → SVG) — repeatable
@@ -27,7 +27,7 @@ usage:
       --terminal <file|->  add a terminal surface from monospace/ANSI output — repeatable
       --json <file|->    add a json surface from a JSON file (collapsible tree) — repeatable
       --code <file|->    add a code surface from a file (shiki-highlighted) — repeatable
-      --kit <id>        opt the html surface into a kit (repeatable; see "sideshow kits")
+      --kit <id>        opt the html surface into a kit (repeatable; see "shuvshow kits")
       --image <file>    upload an image and append it as an image surface — repeatable
       --session <id>    target session (default: auto per agent session)
       surfaces appear in command-line flag order; repeat a flag to add several of one kind
@@ -35,35 +35,35 @@ usage:
                         e.g. "Auth refactor" (ignored if the session exists)
       --agent <name>    agent name for new sessions (default: $SIDESHOW_AGENT or "agent")
       --new-session     force a fresh session
-  sideshow upload <file> [options]        upload an asset, print its id and URL
+  shuvshow upload <file> [options]        upload an asset, print its id and URL
       --kind <k>        image|trace|file (default: inferred from the file type)
       --session <id>    session to attach to (default: auto)
-  sideshow asset-url <file>               print the URL a file will have (content hash; no upload)
-  sideshow image <file> [options]         upload an image and publish it as a post
+  shuvshow asset-url <file>               print the URL a file will have (content hash; no upload)
+  shuvshow image <file> [options]         upload an image and publish it as a post
       --title <t>       post title
       --caption <c>     caption shown under the image
       (also: --session, --session-title, --agent, --new-session)
-  sideshow trace <file> [options]         upload a trace file and publish it as a post
+  shuvshow trace <file> [options]         upload a trace file and publish it as a post
       --title <t>       post title
       (also: --session, --session-title, --agent, --new-session)
-  sideshow diff <file|-> [options]        publish a diff post from a patch
+  shuvshow diff <file|-> [options]        publish a diff post from a patch
       --title <t>       post title
       --layout <mode>   "unified" (default) or "split"
       (also: --session, --session-title, --agent, --new-session)
-  sideshow markdown <file|-> [options]    publish a markdown post (prose)
+  shuvshow markdown <file|-> [options]    publish a markdown post (prose)
       --title <t>       post title
-  sideshow terminal <file|-> [options]    publish terminal output (monospace + ANSI)
+  shuvshow terminal <file|-> [options]    publish terminal output (monospace + ANSI)
       --title <t>       post title
       --term-title <t>  label shown in the terminal window chrome
       --cols <n>        render width hint, in columns
       (also: --session, --session-title, --agent, --new-session)
-  sideshow mermaid <file|-> [options]     publish a mermaid post (diagram → SVG)
+  shuvshow mermaid <file|-> [options]     publish a mermaid post (diagram → SVG)
       --title <t>       post title
       (also: --session, --session-title, --agent, --new-session)
-  sideshow json <file|-> [options]        publish a JSON post (collapsible tree)
+  shuvshow json <file|-> [options]        publish a JSON post (collapsible tree)
       --title <t>       post title
       (also: --session, --session-title, --agent, --new-session)
-  sideshow code <file|-> [options]        publish a code post (shiki-highlighted)
+  shuvshow code <file|-> [options]        publish a code post (shiki-highlighted)
       --title <t>       post (card) title
       --filename <f>    filename shown in the code header bar (defaults to the
                         file argument's basename)
@@ -72,12 +72,12 @@ usage:
       --line-start <n>  1-based line number the excerpt starts at (shows
                         original line numbers instead of 1-based)
       (also: --session, --session-title, --agent, --new-session)
-  sideshow kits                           list the opt-in html kits this workspace offers
-  sideshow update <id> <file|->           revise a post (new version, same card)
+  shuvshow kits                           list the opt-in html kits this workspace offers
+  shuvshow update <id> <file|->           revise a post (new version, same card)
       --title <t>       replace title
       --kit <id>        opt the html surface into a kit (repeatable)
       --surface <N>     target surface N (id or 0-based index) in a multi-surface post
-  sideshow surface <sub> [options]        edit individual surfaces of a post
+  shuvshow surface <sub> [options]        edit individual surfaces of a post
     surface add <id> [flags]              append a surface to an existing post
         --md <f>          markdown surface (repeatable)
         --code <f>        code surface (language inferred from filename; repeatable)
@@ -93,26 +93,26 @@ usage:
     surface remove <id> <N>               remove surface N (id or 0-based index)
     surface edit <id> <N> <file|->        replace surface N's content (kind preserved)
     surface move <id> <N> --to <M>        move surface N to position M
-  sideshow wait [options]                 block until the user comments (long-poll)
+  shuvshow wait [options]                 block until the user comments (long-poll)
       --session <id>    session to watch (default: auto)
       --timeout <sec>   max seconds to wait (default 120)
       --after <seq>     re-read comments after this cursor (default: where the
                         agent left off, tracked server-side across CLI/MCP)
-  sideshow watch [options]                stream user comments forever, one per
+  shuvshow watch [options]                stream user comments forever, one per
                                           line (re-arms the long-poll; for a
                                           background monitor)
       --session <id>    session to watch (default: auto, waits for the first
                         publish to create one)
       --after <seq>     re-read comments after this cursor on the first poll
                         (default: resume where the agent left off, server-side)
-  sideshow install-hook [options]         register a Claude Code Stop hook so the
+  shuvshow install-hook [options]         register a Claude Code Stop hook so the
                                           trace syncs itself after every turn —
                                           hands-off, no agent effort (Claude Code)
       --shared          write .claude/settings.json (committed) instead of the
                         default .claude/settings.local.json (gitignored, personal)
       --user            write ~/.claude/settings.json (all projects)
       --print           print the hook JSON snippet instead of writing settings
-  sideshow trace-sync [options]           manually sync your step trace from the
+  shuvshow trace-sync [options]           manually sync your step trace from the
                                           session transcript onto the timeline —
                                           the fallback when the hook isn't set up
                                           (run after publishing)
@@ -124,34 +124,34 @@ usage:
       --all             sync the whole transcript, not just the windowed slice
       --reset           replace the session's trace (full re-sync, not just the tail)
       --quiet           print nothing on success
-  sideshow comment <text> [options]       reply to the user on a post
+  shuvshow comment <text> [options]       reply to the user on a post
       --post <id>       post to attach the comment to (required;
                         --surface is a deprecated alias)
       --author <name>   defaults to agent name
-  sideshow list [--session <id>|--all]    list posts
-  sideshow show <id>                      show a single post (surfaces, indexes, ids, version, history)
-  sideshow sessions                       list sessions
-  sideshow demo                           seed two example sessions to explore the viewer
-  sideshow test-post [--agent <name>]     publish the built-in welcome post (idempotent)
-  sideshow guide                          print the design contract for posts
-  sideshow setup                          print the AGENTS.md integration block
-  sideshow agent-howto             print current agent how-to
-  sideshow version                         show version and check for updates
-  sideshow mcp                            run the stdio MCP server (for agent configs)
+  shuvshow list [--session <id>|--all]    list posts
+  shuvshow show <id>                      show a single post (surfaces, indexes, ids, version, history)
+  shuvshow sessions                       list sessions
+  shuvshow demo                           seed two example sessions to explore the viewer
+  shuvshow test-post [--agent <name>]     publish the built-in welcome post (idempotent)
+  shuvshow guide                          print the design contract for posts
+  shuvshow setup                          print the AGENTS.md integration block
+  shuvshow agent-howto             print current agent how-to
+  shuvshow version                         show version and check for updates
+  shuvshow mcp                            run the stdio MCP server (for agent configs)
 
 flags:
   --version, -V                           print version and exit
 
 environment:
   SIDESHOW_URL      server base URL (default http://localhost:8228; set to a
-                    deployed instance, e.g. https://sideshow.you.workers.dev)
+                    deployed instance, e.g. https://shuvshow.you.workers.dev)
   SIDESHOW_TOKEN    bearer token for a deployed instance
   SIDESHOW_SESSION  fixed session id (overrides auto-detection)
   SIDESHOW_AGENT    agent name used when creating sessions
 `;
 
 function fail(msg) {
-  console.error(`sideshow: ${msg}`);
+  console.error(`shuvshow: ${msg}`);
   process.exit(1);
 }
 
@@ -167,7 +167,7 @@ async function api(path, init = {}) {
       },
     });
   } catch {
-    fail(`server not reachable at ${BASE} — start it with: sideshow serve`);
+    fail(`server not reachable at ${BASE} — start it with: shuvshow serve`);
   }
   const body = await res.json().catch(() => ({}));
   if (!res.ok) fail(body.error ?? `${res.status} ${res.statusText}`);
@@ -248,7 +248,7 @@ function agentPid() {
 }
 
 function stateFile() {
-  const dir = join(tmpdir(), `sideshow-${userInfo().username}`);
+  const dir = join(tmpdir(), `shuvshow-${userInfo().username}`);
   mkdirSync(dir, { recursive: true, mode: 0o700 });
   const key = createHash("sha1")
     .update(`${agentPid()}:${process.cwd()}`)
@@ -370,7 +370,7 @@ function contentTypeFor(file) {
 
 // Map a filename extension to a shiki language id. Only common languages —
 // shiki knows many more, but this covers the files an agent is likely to
-// `sideshow code`. Unmapped extensions return undefined (shiki "text").
+// `shuvshow code`. Unmapped extensions return undefined (shiki "text").
 const LANG_BY_EXT = {
   ts: "typescript",
   tsx: "tsx",
@@ -463,7 +463,7 @@ async function uploadFile(file, { session, kind } = {}) {
       body: bytes,
     });
   } catch {
-    fail(`server not reachable at ${BASE} — start it with: sideshow serve`);
+    fail(`server not reachable at ${BASE} — start it with: shuvshow serve`);
   }
   const body = await res.json().catch(() => ({}));
   if (!res.ok) fail(body.error ?? `${res.status} ${res.statusText}`);
@@ -578,12 +578,12 @@ function versionGt(a, b) {
   return false;
 }
 
-// Disk-cached update check so `sideshow version` doesn't hit the registry every
+// Disk-cached update check so `shuvshow version` doesn't hit the registry every
 // time. TTL = 24 hours; stale/missing/corrupt cache is silently ignored.
 const UPDATE_CACHE_TTL_MS = 24 * 60 * 60 * 1000;
 
 function updateCachePath() {
-  const dir = join(tmpdir(), `sideshow-${userInfo().username}`);
+  const dir = join(tmpdir(), `shuvshow-${userInfo().username}`);
   mkdirSync(dir, { recursive: true, mode: 0o700 });
   return join(dir, "update-check.json");
 }
@@ -598,12 +598,6 @@ function readUpdateCache() {
   return null;
 }
 
-function writeUpdateCache(version) {
-  try {
-    writeFileSync(updateCachePath(), JSON.stringify({ at: Date.now(), version }));
-  } catch {}
-}
-
 // One comment → one line (one monitor notification). Newlines are collapsed so
 // a multi-line comment stays a single notification.
 function watchLine(c) {
@@ -611,7 +605,7 @@ function watchLine(c) {
     .replace(/\s+/g, " ")
     .trim();
   const where = c.postId ? `on “${c.postTitle ?? "a post"}” (post ${c.postId})` : "on the session";
-  return `sideshow comment ${where}: “${text}”`;
+  return `shuvshow comment ${where}: “${text}”`;
 }
 
 const [cmd, ...rest] = process.argv.slice(2);
@@ -645,7 +639,7 @@ function parse(config = {}) {
     });
   } catch (err) {
     if (!String(err?.code).startsWith("ERR_PARSE_ARGS")) throw err;
-    fail(`${err.message.split(". ")[0]} — run "sideshow help"`);
+    fail(`${err.message.split(". ")[0]} — run "shuvshow help"`);
   }
   if (parsed.values.help) {
     console.log(HELP);
@@ -962,7 +956,7 @@ const commands = {
       options: { session: { type: "string" }, kind: { type: "string" } },
     });
     const file = positionals[0];
-    if (!file || file === "-") fail("usage: sideshow upload <file> [--kind k] [--session id]");
+    if (!file || file === "-") fail("usage: shuvshow upload <file> [--kind k] [--session id]");
     const session = flags.session ?? (await resolveSession(flags, { create: true }));
     const asset = await uploadFile(file, { session, kind: flags.kind });
     out(asset);
@@ -974,7 +968,7 @@ const commands = {
   async "asset-url"() {
     const { positionals } = parse({ allowPositionals: true, options: {} });
     const file = positionals[0];
-    if (!file || file === "-") fail("usage: sideshow asset-url <file>");
+    if (!file || file === "-") fail("usage: shuvshow asset-url <file>");
     const id = createHash("sha256").update(readFileSync(file)).digest("hex");
     out({ id, url: `${BASE}/a/${id}` });
   },
@@ -992,7 +986,7 @@ const commands = {
       },
     });
     const file = positionals[0];
-    if (!file || file === "-") fail("usage: sideshow image <file> [--title t]");
+    if (!file || file === "-") fail("usage: shuvshow image <file> [--title t]");
     const session = await resolveSession(flags, { create: true });
     const asset = await uploadFile(file, { session, kind: "image" });
     const part = {
@@ -1015,7 +1009,7 @@ const commands = {
       },
     });
     const file = positionals[0];
-    if (!file || file === "-") fail("usage: sideshow trace <file> [--title t]");
+    if (!file || file === "-") fail("usage: shuvshow trace <file> [--title t]");
     const session = await resolveSession(flags, { create: true });
     const asset = await uploadFile(file, { session, kind: "trace" });
     outPost(
@@ -1114,7 +1108,7 @@ const commands = {
         "new-session": { type: "boolean" },
       },
     });
-    if (!positionals[0]) fail("usage: sideshow json <file|-> [--title t]");
+    if (!positionals[0]) fail("usage: shuvshow json <file|-> [--title t]");
     const text = readContent(positionals[0]);
     let data;
     try {
@@ -1141,7 +1135,7 @@ const commands = {
     });
     if (!positionals[0])
       fail(
-        "usage: sideshow code <file|-> [--title t] [--filename f] [--language lang] [--line-start n]",
+        "usage: shuvshow code <file|-> [--title t] [--filename f] [--language lang] [--line-start n]",
       );
     const code = readContent(positionals[0]);
     const lang = flags.language ?? (positionals[0] !== "-" ? inferLang(positionals[0]) : undefined);
@@ -1168,7 +1162,7 @@ const commands = {
       },
     });
     const id = positionals[0];
-    if (!id) fail("usage: sideshow update <id> <file|-> [--surface N]");
+    if (!id) fail("usage: shuvshow update <id> <file|-> [--surface N]");
     const body = {};
     if (flags.title !== undefined) body.title = flags.title;
     if (positionals[1] !== undefined) {
@@ -1215,7 +1209,7 @@ const commands = {
         },
       });
       const postId = positionals[0];
-      if (!postId) fail("usage: sideshow surface add <postId> [--md f] [--code f] ...");
+      if (!postId) fail("usage: shuvshow surface add <postId> [--md f] [--code f] ...");
       const hasSurfaceFlag = (tokens ?? []).some(
         (t) => t.kind === "option" && SURFACE_FLAGS.has(t.name),
       );
@@ -1240,13 +1234,13 @@ const commands = {
     } else if (sub === "remove") {
       const { positionals } = parse({ allowPositionals: true });
       const [postId, target] = positionals;
-      if (!postId || !target) fail("usage: sideshow surface remove <postId> <N|id>");
+      if (!postId || !target) fail("usage: shuvshow surface remove <postId> <N|id>");
       outPost(await api(`/api/posts/${postId}/surfaces/${target}`, { method: "DELETE" }));
     } else if (sub === "edit") {
       const { positionals } = parse({ allowPositionals: true });
       const [postId, target, file] = positionals;
       if (!postId || !target || file === undefined) {
-        fail("usage: sideshow surface edit <postId> <N|id> <file|->");
+        fail("usage: shuvshow surface edit <postId> <N|id> <file|->");
       }
       outPost(
         await api(`/api/posts/${postId}/surfaces/${target}`, {
@@ -1261,7 +1255,7 @@ const commands = {
       });
       const [postId, target] = positionals;
       if (!postId || !target || flags.to === undefined) {
-        fail("usage: sideshow surface move <postId> <N|id> --to <M>");
+        fail("usage: shuvshow surface move <postId> <N|id> --to <M>");
       }
       const post = await api(`/api/posts/${postId}`);
       const surfaces = post.surfaces ?? [];
@@ -1419,7 +1413,7 @@ const commands = {
   },
 
   // Internal: run from a Claude Code Stop hook. Reads the hook payload on stdin
-  // (transcript_path, cwd) and syncs the trace for whichever sideshow session
+  // (transcript_path, cwd) and syncs the trace for whichever shuvshow session
   // owns that cwd. Claude Code hands us the exact transcript, so this never has
   // to guess. Must NEVER disturb the agent — every failure path is swallowed and
   // the process exits 0 with no stdout (a Stop hook's stdout is parsed as JSON).
@@ -1431,7 +1425,7 @@ const commands = {
       const cwd = payload.cwd || process.cwd();
       if (!transcript || !existsSync(transcript)) return;
       const session = process.env.SIDESHOW_SESSION ?? (await resolveSessionByCwd(cwd));
-      if (!session) return; // no sideshow session for this cwd — nothing to trace
+      if (!session) return; // no shuvshow session for this cwd — nothing to trace
       await syncTrace({ session, transcript });
     } catch {
       // A trace hook must never interfere with the agent — stay silent.
@@ -1471,10 +1465,11 @@ const commands = {
     }
     settings.hooks ??= {};
     settings.hooks[event] ??= [];
-    // Match our specific `sideshow[.js] hook` invocation — NOT the feedback
-    // hook (`sideshow-stop-hook.mjs check|watch`), which also contains both
-    // "sideshow" and "hook" but ends in a different verb.
-    const isOurs = (cmd) => typeof cmd === "string" && /sideshow(\.js)?["']?\s+hook\b/.test(cmd);
+    // The source filename remains sideshow.js to keep the fork delta small; the
+    // installed executable is shuvshow. Match either spelling, but only this
+    // script's `hook` verb, not the separate feedback monitor.
+    const isOurs = (cmd) =>
+      typeof cmd === "string" && /(?:shuvshow|sideshow)(\.js)?["']?\s+hook\b/.test(cmd);
     const already = settings.hooks[event].some((g) =>
       (g.hooks ?? []).some((h) => isOurs(h.command)),
     );
@@ -1500,7 +1495,7 @@ const commands = {
       },
     });
     const text = positionals.join(" ").trim();
-    if (!text) fail("usage: sideshow comment <text> --post <id>");
+    if (!text) fail("usage: shuvshow comment <text> --post <id>");
     // --surface / --snippet stay as back-compat aliases for --post; the request
     // body key is the wire field `surface`, kept as-is.
     const post = flags.post ?? flags.surface ?? flags.snippet;
@@ -1537,7 +1532,7 @@ const commands = {
   async show() {
     const { positionals } = parse({ allowPositionals: true });
     const id = positionals[0];
-    if (!id) fail("usage: sideshow show <id>");
+    if (!id) fail("usage: shuvshow show <id>");
     out(await api(`/api/posts/${id}`));
   },
 
@@ -1620,7 +1615,7 @@ const commands = {
   // Print the running version and check for updates (non-blocking, best-effort).
   async version() {
     parse();
-    console.log(`sideshow ${PKG_VERSION}`);
+    console.log(`shuvshow ${PKG_VERSION}`);
     try {
       const cached = readUpdateCache();
       let latest = cached;
@@ -1628,7 +1623,7 @@ const commands = {
         const ctrl = new AbortController();
         const timer = setTimeout(() => ctrl.abort(), 3000);
         try {
-          const res = await fetch("https://registry.npmjs.org/sideshow/latest", {
+          const res = await fetch("https://registry.npmjs.org/shuvshow/latest", {
             signal: ctrl.signal,
           });
           clearTimeout(timer);
@@ -1636,7 +1631,12 @@ const commands = {
             const pkg = await res.json();
             if (typeof pkg.version === "string") {
               latest = pkg.version;
-              writeUpdateCache(latest);
+              try {
+                writeFileSync(
+                  updateCachePath(),
+                  JSON.stringify({ at: Date.now(), version: latest }),
+                );
+              } catch {}
             }
           }
         } catch {
@@ -1645,7 +1645,7 @@ const commands = {
       }
       if (latest && versionGt(latest, PKG_VERSION)) {
         console.log(`\nUpdate available: ${PKG_VERSION} → ${latest}`);
-        console.log(`Run: npm install -g sideshow`);
+        console.log(`Run: npm install -g shuvshow`);
       }
     } catch {
       // Never let the update check fail the command.
@@ -1668,5 +1668,5 @@ if (cmd === "--version" || cmd === "-V") {
 } else if (commands[cmd]) {
   await commands[cmd]();
 } else {
-  fail(`unknown command "${cmd}" — run "sideshow help"`);
+  fail(`unknown command "${cmd}" — run "shuvshow help"`);
 }

@@ -211,15 +211,15 @@ function versionGt(a: string, b: string): boolean {
 // release. Notes are garnish: if GitHub is unreachable the version alone
 // still makes a usable notice.
 async function fetchLatestFromRegistry(): Promise<LatestRelease | null> {
-  const res = await fetch("https://registry.npmjs.org/sideshow/latest");
+  const res = await fetch("https://registry.npmjs.org/shuvshow/latest");
   if (!res.ok) return null;
   const pkg = (await res.json()) as { version?: string };
   if (typeof pkg.version !== "string") return null;
   let notes: string | undefined;
   try {
     const gh = await fetch(
-      `https://api.github.com/repos/modem-dev/sideshow/releases/tags/v${pkg.version}`,
-      { headers: { "user-agent": "sideshow", accept: "application/vnd.github+json" } },
+      `https://api.github.com/repos/shuv1337/shuvshow/releases/tags/v${pkg.version}`,
+      { headers: { "user-agent": "shuvshow", accept: "application/vnd.github+json" } },
     );
     if (gh.ok) {
       const rel = (await gh.json()) as { body?: string };
@@ -886,7 +886,7 @@ export function createApp({
   const sessionDocumentTitle = (session: Session | null | undefined) => {
     if (!session) return null;
     const label = session.title || (session.agent ? `${session.agent} session` : null);
-    return label ? `${label} · sideshow` : null;
+    return label ? `${label} · shuvshow` : null;
   };
 
   const withViewerConfig = (
@@ -913,7 +913,7 @@ export function createApp({
     const canonical = `${origin}${publicBasePath}/p/${post.id}`;
     const image = `${origin}${publicBasePath}/p/${post.id}.png?card=1`;
     const title = escapeHtml(post.title);
-    const description = "A https://sideshow.sh surface";
+    const description = "A shuvshow surface";
     return [
       `<link rel="canonical" href="${escapeHtml(canonical)}">`,
       `<meta property="og:type" content="website">`,

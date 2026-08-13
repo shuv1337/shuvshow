@@ -1,21 +1,21 @@
 {
   "$schema": "https://json.schemastore.org/claude-code-plugin-manifest.json",
-  "name": "sideshow",
-  "displayName": "sideshow",
+  "name": "shuvshow",
+  "displayName": "shuvshow",
   "version": "0.1.0",
-  "description": "Stream sideshow browser comments to Claude Code as notifications, and publish snippets over MCP.",
-  "author": { "name": "modem", "email": "ben@modem.dev" },
-  "homepage": "https://github.com/modem-dev/sideshow",
-  "repository": "https://github.com/modem-dev/sideshow",
+  "description": "Stream shuvshow browser comments to Claude Code as notifications, and publish snippets over MCP.",
+  "author": { "name": "shuv1337" },
+  "homepage": "https://github.com/shuv1337/shuvshow",
+  "repository": "https://github.com/shuv1337/shuvshow",
   "license": "MIT",
-  "keywords": ["sideshow", "visualization", "feedback", "mcp"],
+  "keywords": ["shuvshow", "visualization", "feedback", "mcp"],
   "skills": "./skills/",
   "mcpServers": {
-    "sideshow": {
+    "shuvshow": {
       "command": "npx",
-      "args": ["-y", "sideshow", "mcp"],
+      "args": ["-y", "shuvshow", "mcp"],
       "env": {
-        "SIDESHOW_URL": "${user_config.sideshowUrl}",
+        "SIDESHOW_URL": "${user_config.shuvshowUrl}",
         "SIDESHOW_TOKEN": "${user_config.apiToken}"
       }
     }
@@ -24,17 +24,17 @@
     "monitors": "./monitors.json"
   },
   "userConfig": {
-    "sideshowUrl": {
+    "shuvshowUrl": {
       "type": "string",
-      "title": "Sideshow URL",
-      "description": "Base URL of your sideshow server. Local default is http://localhost:8228; set your deployed instance (e.g. https://sideshow.you.workers.dev) otherwise.",
+      "title": "shuvshow URL",
+      "description": "Base URL of your shuvshow server. Local default is http://localhost:8228; set your deployed instance (e.g. https://shuvshow.you.workers.dev) otherwise.",
       "default": "http://localhost:8228",
       "required": true
     },
     "apiToken": {
       "type": "string",
-      "title": "Sideshow token",
-      "description": "Bearer token for a deployed sideshow instance. Leave blank for a local server.",
+      "title": "shuvshow token",
+      "description": "Bearer token for a deployed shuvshow instance. Leave blank for a local server.",
       "sensitive": true
     }
   }

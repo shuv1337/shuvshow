@@ -494,7 +494,7 @@ test("a comment's copy button puts an agent-ready paste block on the clipboard",
   await expect(page.locator("#toast")).toContainText("Copied");
   if (browserName === "chromium") {
     expect(await page.evaluate(() => navigator.clipboard.readText())).toBe(
-      `sideshow comment on “Doc” (post ${snippet.id}):\n“tighten the spacing”`,
+      `shuvshow comment on “Doc” (post ${snippet.id}):\n“tighten the spacing”`,
     );
   }
 });
@@ -609,13 +609,13 @@ test("activity in an unselected session badges the tab title until viewed", asyn
   await publish(server.url, { html: "<p>a</p>", title: "First", agent: "one" });
 
   await page.goto(server.url);
-  await expect(page).toHaveTitle("one session · sideshow");
+  await expect(page).toHaveTitle("one session · shuvshow");
 
   await publish(server.url, { html: "<p>b</p>", title: "Second", agent: "two" });
 
-  await expect(page).toHaveTitle("(1) one session · sideshow");
+  await expect(page).toHaveTitle("(1) one session · shuvshow");
   await page.locator(".sess", { hasText: "two" }).click();
-  await expect(page).toHaveTitle("two session · sideshow");
+  await expect(page).toHaveTitle("two session · shuvshow");
 });
 
 test("Cmd+Option+Up/Down switches between sessions, wrapping at the ends", async ({

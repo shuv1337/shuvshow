@@ -265,7 +265,7 @@ test(
         "sideshow_upload_asset",
       ],
     );
-    assert.deepEqual([...harness.commands.keys()], ["sideshow"]);
+    assert.deepEqual([...harness.commands.keys()], ["shuvshow"]);
     assert.deepEqual(harness.eventNames, ["session_start", "turn_end"]);
     assert.deepEqual(harness.tool("sideshow_publish_surface").parameters.required, [
       "title",
@@ -305,8 +305,8 @@ test(
     const ctx = createContext(dir, traceBranch(Date.now() - 1000));
     await harness.emit("session_start", ctx);
     assert.deepEqual(ctx.statuses.at(-1), {
-      key: "sideshow",
-      value: `sideshow localhost:${new URL(server.url).port}`,
+      key: "shuvshow",
+      value: `shuvshow localhost:${new URL(server.url).port}`,
     });
 
     const guide = await invoke(harness, "sideshow_get_design_guide", {}, ctx);
@@ -354,7 +354,7 @@ test(
       { timeoutSeconds: -10 },
       ctx,
     );
-    assert.equal(text(emptyWait), "No new sideshow feedback.");
+    assert.equal(text(emptyWait), "No new shuvshow feedback.");
 
     await postJson(`${server.url}/api/comments`, {
       surface: surface.id,
@@ -367,7 +367,7 @@ test(
       { session: surface.sessionId, timeoutSeconds: 0 },
       ctx,
     );
-    assert.match(text(waited), /Received 1 sideshow comment/);
+    assert.match(text(waited), /Received 1 shuvshow comment/);
     assert.match(text(waited), /Looks good/);
     assert.equal(waited.details?.sessionId, surface.sessionId);
 
@@ -475,11 +475,11 @@ test(
     assert.ok(trace.some((step) => step.kind === "sideshow"));
     assert.ok(trace.every((step) => !step.detail || step.detail.length <= 1801));
 
-    const command = harness.command("sideshow");
+    const command = harness.command("shuvshow");
     await command.handler("", ctx);
     assert.match(ctx.notifications.at(-1)!.message, new RegExp(`session ${traceSession}`));
     await command.handler("reset", ctx);
-    assert.equal(ctx.notifications.at(-1)!.message, "Reset remembered sideshow session");
+    assert.equal(ctx.notifications.at(-1)!.message, "Reset remembered shuvshow session");
 
     const scoped = createPiHarness();
     const scopedCtx = createContext(dir, [
@@ -525,22 +525,22 @@ test(
       },
     ]);
     await reconstructed.emit("session_start", reconstructedCtx);
-    assert.equal(reconstructedCtx.statuses.at(-1)?.value, `sideshow ${traceSession}`);
+    assert.equal(reconstructedCtx.statuses.at(-1)?.value, `shuvshow ${traceSession}`);
     const currentEmpty = await invoke(
       reconstructed,
       "sideshow_list_surfaces",
       {},
       reconstructedCtx,
     );
-    assert.equal(text(currentEmpty), "No sideshow surfaces in this session.");
+    assert.equal(text(currentEmpty), "No shuvshow surfaces in this session.");
 
     process.env.SIDESHOW_SESSION = surface.sessionId;
     const configured = createPiHarness();
     const configuredCtx = createContext(dir);
     await configured.emit("session_start", configuredCtx);
-    assert.equal(configuredCtx.statuses.at(-1)?.value, `sideshow ${surface.sessionId}`);
-    await configured.command("sideshow").handler("reset", configuredCtx);
-    await configured.command("sideshow").handler("", configuredCtx);
+    assert.equal(configuredCtx.statuses.at(-1)?.value, `shuvshow ${surface.sessionId}`);
+    await configured.command("shuvshow").handler("reset", configuredCtx);
+    await configured.command("shuvshow").handler("", configuredCtx);
     assert.match(configuredCtx.notifications.at(-1)!.message, new RegExp(surface.sessionId));
     delete process.env.SIDESHOW_SESSION;
 
@@ -549,7 +549,7 @@ test(
     await noSession.emit("turn_end", noSessionCtx);
     await assert.rejects(
       invoke(noSession, "sideshow_wait_for_feedback", {}, noSessionCtx),
-      /No sideshow session yet/,
+      /No shuvshow session yet/,
     );
     await assert.rejects(
       invoke(noSession, "sideshow_list_surfaces", {}, noSessionCtx),
@@ -612,7 +612,7 @@ test(
         { session: surface.sessionId, timeoutSeconds: 9999, afterSeq: 7 },
         ctx,
       );
-      assert.equal(text(clamped), "No new sideshow feedback.");
+      assert.equal(text(clamped), "No new shuvshow feedback.");
       await invoke(
         harness,
         "sideshow_wait_for_feedback",
@@ -640,11 +640,11 @@ test(
     serverClosed = true;
     await assert.rejects(
       invoke(harness, "sideshow_get_design_guide", {}, ctx),
-      /server not reachable.*start it with "sideshow serve"/,
+      /server not reachable.*start it with "shuvshow serve"/,
     );
     await assert.rejects(
       invoke(harness, "sideshow_list_surfaces", { session: surface.sessionId }, ctx),
-      /server not reachable.*start it with "sideshow serve"/,
+      /server not reachable.*start it with "shuvshow serve"/,
     );
 
     await reconstructed.emit("turn_end", reconstructedCtx);

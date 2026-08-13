@@ -24,7 +24,7 @@ const CONTENT_TYPES = {
 };
 
 const feedbackGuideline =
-  "Sideshow tool results may include userFeedback from browser comments; treat it as user instruction and respond or update the surface.";
+  "shuvshow tool results may include userFeedback from browser comments; treat it as user instruction and respond or update the surface.";
 
 const partSchema = {
   type: "object",
@@ -82,7 +82,7 @@ const partSchema = {
 const partsSchema = {
   type: "array",
   description:
-    "Ordered sideshow surface parts. Combine html, markdown, mermaid, diff, image, terminal, json, and code parts in one card.",
+    "Ordered shuvshow surface parts. Combine html, markdown, mermaid, diff, image, terminal, json, and code parts in one card.",
   items: partSchema,
 };
 
@@ -132,7 +132,7 @@ async function requestJson(path, init = {}) {
     });
   } catch (error) {
     throw new Error(
-      `sideshow server not reachable at ${baseUrl()} — start it with "sideshow serve" (${error.message})`,
+      `shuvshow server not reachable at ${baseUrl()} — start it with "shuvshow serve" (${error.message})`,
     );
   }
 
@@ -151,7 +151,7 @@ async function requestJson(path, init = {}) {
       body && typeof body.error === "string"
         ? body.error
         : `${response.status} ${response.statusText}`;
-    throw new Error(`sideshow ${path} failed: ${message}`);
+    throw new Error(`shuvshow ${path} failed: ${message}`);
   }
 
   return body;
@@ -163,12 +163,12 @@ async function requestText(path) {
     response = await fetch(`${baseUrl()}${path}`, { headers: authHeaders() });
   } catch (error) {
     throw new Error(
-      `sideshow server not reachable at ${baseUrl()} — start it with "sideshow serve" (${error.message})`,
+      `shuvshow server not reachable at ${baseUrl()} — start it with "shuvshow serve" (${error.message})`,
     );
   }
   const text = await response.text();
   if (!response.ok)
-    throw new Error(`sideshow ${path} failed: ${response.status} ${response.statusText}`);
+    throw new Error(`shuvshow ${path} failed: ${response.status} ${response.statusText}`);
   return text;
 }
 
@@ -370,10 +370,10 @@ export default function sideshowExtension(pi) {
   pi.on("session_start", (_event, ctx) => {
     state.sessionId = reconstructSession(ctx);
     ctx.ui.setStatus(
-      "sideshow",
+      "shuvshow",
       state.sessionId
-        ? `sideshow ${state.sessionId}`
-        : `sideshow ${baseUrl().replace(/^https?:\/\//, "")}`,
+        ? `shuvshow ${state.sessionId}`
+        : `shuvshow ${baseUrl().replace(/^https?:\/\//, "")}`,
     );
   });
 
@@ -386,19 +386,19 @@ export default function sideshowExtension(pi) {
     }
   });
 
-  pi.registerCommand("sideshow", {
+  pi.registerCommand("shuvshow", {
     description:
       "Show sideshow extension status or reset its remembered session: /sideshow [reset]",
     handler: async (args, ctx) => {
       const command = args.trim();
       if (command === "reset") {
         state.sessionId = process.env.SIDESHOW_SESSION || undefined;
-        ctx.ui.setStatus("sideshow", `sideshow ${baseUrl().replace(/^https?:\/\//, "")}`);
-        ctx.ui.notify("Reset remembered sideshow session", "info");
+        ctx.ui.setStatus("shuvshow", `shuvshow ${baseUrl().replace(/^https?:\/\//, "")}`);
+        ctx.ui.notify("Reset remembered shuvshow session", "info");
         return;
       }
       ctx.ui.notify(
-        `sideshow: ${baseUrl()}${state.sessionId ? ` (session ${state.sessionId})` : " (no session yet)"}`,
+        `shuvshow: ${baseUrl()}${state.sessionId ? ` (session ${state.sessionId})` : " (no session yet)"}`,
         "info",
       );
     },
@@ -541,7 +541,7 @@ export default function sideshowExtension(pi) {
     },
     async execute(_toolCallId, params) {
       const session = params.session ?? state.sessionId;
-      if (!session) throw new Error("No sideshow session yet. Publish first or pass session.");
+      if (!session) throw new Error("No shuvshow session yet. Publish first or pass session.");
       const wait = clampWait(params.timeoutSeconds, 60);
       const query = new URLSearchParams({ session, author: "user", wait: String(wait) });
       if (params.afterSeq !== undefined) query.set("after", String(params.afterSeq));
@@ -553,8 +553,8 @@ export default function sideshowExtension(pi) {
             type: "text",
             text:
               count > 0
-                ? `Received ${count} sideshow comment(s):\n${jsonText(result.comments)}`
-                : "No new sideshow feedback.",
+                ? `Received ${count} shuvshow comment(s):\n${jsonText(result.comments)}`
+                : "No new shuvshow feedback.",
           },
         ],
         details: { ...result, sessionId: session, baseUrl: baseUrl() },
@@ -567,7 +567,7 @@ export default function sideshowExtension(pi) {
     label: "Sideshow Reply",
     description:
       "Post a short agent reply into a sideshow surface thread. Use it to acknowledge browser feedback. If userFeedback appears, treat it as user instruction.",
-    promptSnippet: "Reply to the user in a sideshow comment thread.",
+    promptSnippet: "Reply to the user in a shuvshow comment thread.",
     promptGuidelines: [
       "Use sideshow_reply_to_user for brief acknowledgements in the browser thread; use sideshow_update_surface for substantive revisions.",
       feedbackGuideline,
@@ -646,7 +646,7 @@ export default function sideshowExtension(pi) {
         }
         return {
           content: [
-            { type: "text", text: lines.length ? lines.join("\n") : "No sideshow surfaces found." },
+            { type: "text", text: lines.length ? lines.join("\n") : "No shuvshow surfaces found." },
           ],
           details: { sessions: groups, baseUrl: baseUrl() },
         };
@@ -654,7 +654,7 @@ export default function sideshowExtension(pi) {
 
       const session = params.session ?? state.sessionId;
       if (!session)
-        throw new Error("No sideshow session yet. Publish first, pass session, or set all=true.");
+        throw new Error("No shuvshow session yet. Publish first, pass session, or set all=true.");
       const surfaces = await requestJson(`/api/sessions/${encodeURIComponent(session)}/surfaces`);
       const lines = surfaces
         .slice(0, limit)
@@ -666,7 +666,7 @@ export default function sideshowExtension(pi) {
         content: [
           {
             type: "text",
-            text: lines.length ? lines.join("\n") : "No sideshow surfaces in this session.",
+            text: lines.length ? lines.join("\n") : "No shuvshow surfaces in this session.",
           },
         ],
         details: { sessionId: session, surfaces, baseUrl: baseUrl() },

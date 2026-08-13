@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-labelledby="title desc">
+  <title id="title">shuvshow monochrome devil stage mark</title>
+  <desc id="desc">A one-color horned stage window with three surfaces and a pointed tail.</desc>
+  <path d="M13 7c3.5 5.5 7 7.5 12.5 8h13C44 14.5 47.5 12.5 51 7c1.5 6 2 10 2 16v22a9 9 0 0 1-9 9H20a9 9 0 0 1-9-9V23c0-6 .5-10 2-16Z" fill="currentColor"/>
+  <path d="M22 27h20M22 34h14M22 41h18" fill="none" stroke="var(--mark-cutout, #fff)" stroke-linecap="round" stroke-width="3"/>
+  <path d="M44 51c8 0 11-3 11-9" fill="none" stroke="currentColor" stroke-width="4"/>
+  <path d="m59 42-7-1 4-6Z" fill="currentColor"/>
+</svg>

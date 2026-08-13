@@ -140,7 +140,7 @@ aside {
 .brand {
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 7px;
   padding: 16px 16px 12px;
   font-size: 15px;
   font-weight: 500;
@@ -162,7 +162,29 @@ aside {
   padding-right: 8px;
 }
 .brand:hover {
-  color: var(--accent);
+  color: #d35c46;
+}
+.brand-mark {
+  width: 19px;
+  height: 19px;
+  flex: 0 0 auto;
+  overflow: visible;
+  fill: currentColor;
+  color: #d35c46;
+}
+.brand-mark-lines,
+.brand-mark-tail {
+  fill: none;
+  stroke: var(--bg);
+  stroke-linecap: round;
+  stroke-width: 3px;
+}
+.brand-mark-tail {
+  stroke: currentColor;
+  stroke-width: 4px;
+}
+.brand-name {
+  min-width: 0;
 }
 .brand:focus-visible {
   outline: 2px solid var(--accent);
@@ -174,7 +196,8 @@ aside {
   height: 7px;
   border-radius: 50%;
   background: var(--faint);
-  transition: background 0.3s;
+  margin-left: 1px;
+  transition: background 0.2s;
 }
 .livedot.on {
   background: #4caf78;

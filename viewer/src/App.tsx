@@ -94,13 +94,24 @@ function Brand() {
     <button
       class="brand"
       type="button"
-      aria-label="sideshow — home"
+      aria-label="shuvshow — home"
       onClick={() => {
         setConnectPath(false);
         goHome();
       }}
     >
-      <span class="livedot" classList={{ on: live() }}></span>sideshow
+      <svg class="brand-mark" viewBox="0 0 64 64" aria-hidden="true">
+        <path d="M13 7c3.5 5.5 7 7.5 12.5 8h13C44 14.5 47.5 12.5 51 7c1.5 6 2 10 2 16v22a9 9 0 0 1-9 9H20a9 9 0 0 1-9-9V23c0-6 .5-10 2-16Z" />
+        <path class="brand-mark-lines" d="M22 27h20M22 34h14M22 41h18" />
+        <path class="brand-mark-tail" d="M44 51c8 0 11-3 11-9" />
+        <path d="m59 42-7-1 4-6Z" />
+      </svg>
+      <span class="brand-name">shuvshow</span>
+      <span
+        class="livedot"
+        classList={{ on: live() }}
+        aria-label={live() ? "live" : "offline"}
+      ></span>
     </button>
   );
 }
@@ -111,10 +122,10 @@ function pageTitle(
   unreadCount: number,
   serverTitle: string | undefined,
 ) {
-  if (post) return post.title || "sideshow";
+  if (post) return post.title || "shuvshow";
   const sessionTitle =
-    session && (session.title || session.agent) ? `${sessionLabel(session)} · sideshow` : null;
-  const base = sessionTitle || serverTitle || "sideshow";
+    session && (session.title || session.agent) ? `${sessionLabel(session)} · shuvshow` : null;
+  const base = sessionTitle || serverTitle || "shuvshow";
   return unreadCount > 0 ? `(${unreadCount}) ${base}` : base;
 }
 
@@ -395,8 +406,8 @@ function StandaloneView(props: { post: Post }) {
       <main class="standalone-main">
         <Card post={props.post} standalone />
         <footer class="standalone-foot">
-          <a href="https://sideshow.sh" target="_blank" rel="noopener noreferrer">
-            made with <strong>sideshow</strong>
+          <a href="https://github.com/shuv1337/shuvshow" target="_blank" rel="noopener noreferrer">
+            made with <strong>shuvshow</strong>
           </a>
         </footer>
       </main>
@@ -775,14 +786,14 @@ function Onboard() {
           fallback={
             <>
               <h1>Nothing here yet</h1>
-              <p class="sub">This sideshow workspace does not have any sessions yet.</p>
+              <p class="sub">This shuvshow workspace does not have any sessions yet.</p>
             </>
           }
         >
           <ConnectInstructions
             variant="card"
             title="Connect your first agent"
-            subtitle="Sideshow is a live stage where coding agents post HTML — diagrams, sketches, explainers — while they work in your terminal."
+            subtitle="shuvshow is a live stage where coding agents publish diagrams, sketches, explainers, and reviews while they work in your terminal."
             awaiting
           />
         </Show>
@@ -802,7 +813,7 @@ function ConnectPage() {
             fallback={<p>This workspace is read-only, so new agents cannot connect from here.</p>}
           >
             <p>
-              One command wires sideshow into Claude Code, Cursor, Codex, VS Code, opencode, and
+              One command wires shuvshow into Claude Code, Cursor, Codex, VS Code, OpenCode, and
               other MCP-capable agents. New posts show up here automatically.
             </p>
           </Show>

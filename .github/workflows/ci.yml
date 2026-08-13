@@ -33,6 +33,7 @@ jobs:
       - run: npm run security:audit
 
       - run: npm run format:check
+      - run: npm run brand:check
       - run: npm run lint
       - run: npm run typecheck
       - run: npm run coverage
@@ -47,13 +48,13 @@ jobs:
       - name: Pack and smoke-test the CLI
         run: |
           npm pack
-          npm install -g --ignore-scripts ./sideshow-*.tgz
-          sideshow help
-          SIDESHOW_DATA=/tmp/sideshow.json sideshow serve &
+          npm install -g --ignore-scripts ./shuvshow-*.tgz
+          shuvshow help
+          SIDESHOW_DATA=/tmp/sideshow.json shuvshow serve &
           for i in $(seq 1 20); do curl -sf localhost:8228/api/sessions > /dev/null && break; sleep 0.5; done
-          echo '<p>ci smoke</p>' | sideshow publish - --title "CI smoke" --agent ci | tee /tmp/out.json
+          echo '<p>ci smoke</p>' | shuvshow publish - --title "CI smoke" --agent ci | tee /tmp/out.json
           grep -q '"sessionId"' /tmp/out.json
-          sideshow demo | grep -q "Seeded 2 demo sessions"
+          shuvshow demo | grep -q "Seeded 2 demo sessions"
           curl -sf localhost:8228/guide > /dev/null
 
   e2e:
@@ -91,14 +92,14 @@ jobs:
       - run: npm pack
       - name: Install packed CLI
         shell: bash
-        run: npm install -g --ignore-scripts ./sideshow-*.tgz
-      - run: sideshow help
+        run: npm install -g --ignore-scripts ./shuvshow-*.tgz
+      - run: shuvshow help
         shell: bash
       - name: Smoke-test server and publish round trip
         shell: bash
         run: |
-          SIDESHOW_DATA="$RUNNER_TEMP/sideshow.json" sideshow serve &
+          SIDESHOW_DATA="$RUNNER_TEMP/sideshow.json" shuvshow serve &
           for i in $(seq 1 20); do curl -sf localhost:8228/api/sessions > /dev/null && break; sleep 0.5; done
-          echo '<p>ci smoke</p>' | sideshow publish - --title "CI smoke" --agent ci | tee "$RUNNER_TEMP/out.json"
+          echo '<p>ci smoke</p>' | shuvshow publish - --title "CI smoke" --agent ci | tee "$RUNNER_TEMP/out.json"
           grep -q '"sessionId"' "$RUNNER_TEMP/out.json"
           curl -sf localhost:8228/guide > /dev/null

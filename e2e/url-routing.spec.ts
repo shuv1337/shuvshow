@@ -55,10 +55,10 @@ test("the browser title follows the selected session", async ({ page, server }) 
   });
 
   await page.goto(`${server.url}/session/${s1.sessionId}`);
-  await expect(page).toHaveTitle("Auth refactor · sideshow");
+  await expect(page).toHaveTitle("Auth refactor · shuvshow");
 
   await page.locator(`#sessionList .sess[data-id="${s2.sessionId}"]`).click();
-  await expect(page).toHaveTitle("Release prep · sideshow");
+  await expect(page).toHaveTitle("Release prep · shuvshow");
 });
 
 test("the standalone share page title uses the shared post title", async ({ page, server }) => {
@@ -233,7 +233,10 @@ test("/s/:id bare surface route shows the standalone full-page surface", async (
   await expect(page.locator(`.card[data-id="${s.id}"] .card-title`)).toHaveText("Solo");
   // No comment thread chrome in standalone mode.
   await expect(page.locator(".card .thread")).toHaveCount(0);
-  await expect(page.locator(".standalone-foot a")).toHaveAttribute("href", "https://sideshow.sh");
+  await expect(page.locator(".standalone-foot a")).toHaveAttribute(
+    "href",
+    "https://github.com/shuv1337/shuvshow",
+  );
 
   // It stays on the canonical share URL — it does not rewrite into a
   // session-scoped deep link the way the in-feed deep link does.

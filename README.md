@@ -1,15 +1,20 @@
-# sideshow
+# shuvshow
 
 <p>
-  <a href="https://github.com/modem-dev/sideshow/actions/workflows/ci.yml"><img src="https://img.shields.io/github/actions/workflow/status/modem-dev/sideshow/ci.yml?branch=main&style=for-the-badge" alt="CI status"></a>
-  <a href="https://www.npmjs.com/package/sideshow"><img src="https://img.shields.io/node/v/sideshow?style=for-the-badge&logo=node.js&logoColor=white" alt="Node version"></a>
+  <a href="https://github.com/shuv1337/shuvshow/actions/workflows/ci.yml"><img src="https://img.shields.io/github/actions/workflow/status/shuv1337/shuvshow/ci.yml?branch=main&style=for-the-badge" alt="CI status"></a>
+  <a href="https://www.npmjs.com/package/shuvshow"><img src="https://img.shields.io/node/v/shuvshow?style=for-the-badge&logo=node.js&logoColor=white" alt="Node version"></a>
   <a href="docs/connecting-agents.md#mcp"><img src="https://img.shields.io/badge/MCP-compatible-7c3aed?style=for-the-badge" alt="MCP compatible"></a>
   <a href="LICENSE"><img src="https://img.shields.io/badge/License-MIT-blue.svg?style=for-the-badge" alt="MIT License"></a>
 </p>
 
 **A live visual surface for your terminal coding agent.**
 
-Your agent works in a wall of text; Sideshow gives it a screen. It publishes
+shuvshow is a rebranded fork of [sideshow](https://github.com/modem-dev/sideshow), initially based on
+upstream release `v0.13.0`. It preserves upstream's MIT license and compatibility contracts while using
+an independent product, package, repository, and release identity. See the
+[upstream delta and sync policy](docs/upstream-delta.md).
+
+Your agent works in a wall of text; shuvshow gives it a screen. It publishes
 **surfaces** — diagrams, UI sketches, rendered markdown, syntax-highlighted
 diffs, terminal output, images — and they render live in your browser while it
 works.
@@ -19,7 +24,7 @@ works.
     <td width="50%" valign="top">
       <picture>
         <source media="(prefers-color-scheme: dark)" srcset="docs/sideshow-dark.png">
-        <img width="100%" alt="The sideshow viewer: agent sessions in a sidebar, a published JWT-flow diagram with a comment thread between the user and claude-code, and an interactive backoff explainer below" src="docs/sideshow-light.png">
+        <img width="100%" alt="The shuvshow viewer: agent sessions in a sidebar, a published JWT-flow diagram with a comment thread between the user and claude-code, and an interactive backoff explainer below" src="docs/sideshow-light.png">
       </picture>
     </td>
     <td width="50%" valign="top">
@@ -48,7 +53,7 @@ Requires Node 22.18 or newer.
 
 ```sh
 npm install
-npx sideshow serve --open   # viewer on http://localhost:8228
+npx shuvshow serve --open   # viewer on http://localhost:8228
 ```
 
 Then point your agent at the surface — paste the setup block into its
@@ -60,14 +65,14 @@ curl -s http://localhost:8228/setup >> AGENTS.md
 
 That bootstrap tells any agent with a shell (Pi, opencode, amp, codex, Claude
 Code) to fetch the current instructions from the running server, then publish
-surfaces and read your comments. Ask it to "sketch this on sideshow" and watch
+surfaces and read your comments. Ask it to "sketch this on shuvshow" and watch
 the card appear.
 
 The running viewer has the same handoff built in: its sidebar footer carries an
 **agent setup** link (the block above) and a polished **connect agent** screen, so
 you can grab the right MCP command without leaving the browser.
 
-No agent handy? `npx sideshow demo` seeds two example sessions to look around.
+No agent handy? `npx shuvshow demo` seeds two example sessions to look around.
 
 **Going further:** richer integration tiers (CLI, MCP, the Pi extension, and the
 Claude Code skill + plugin) are in **[docs/connecting-agents.md](docs/connecting-agents.md)**.
@@ -111,7 +116,7 @@ viewer. A surface is an ordered list of **parts**; one card can carry several.
   <tr>
     <td width="50%" valign="top">
       <img src="docs/surfaces/07-mermaid.png" width="100%" alt="mermaid part — a flowchart rendered from a few lines of text">
-      <p><b><code>mermaid</code></b> — a few lines of diagram source, rendered to an SVG in the sideshow palette. Tag nodes with <code>:::accent</code> to highlight them.</p>
+      <p><b><code>mermaid</code></b> — a few lines of diagram source, rendered to an SVG in the shuvshow palette. Tag nodes with <code>:::accent</code> to highlight them.</p>
     </td>
     <td width="50%" valign="top">
       <img src="docs/surfaces/08-json.png" width="100%" alt="json part — a JSON value rendered as a collapsible tree">
@@ -141,7 +146,7 @@ output tokens also means a faster draw, since a model writes them one at a time.
 
 Measured both ways on identical content (output tokens):
 
-| Showing…              | Hand-built HTML     | sideshow surface     | Saved |
+| Showing…              | Hand-built HTML     | shuvshow surface     | Saved |
 | --------------------- | ------------------- | -------------------- | ----- |
 | Architecture diagram  | hand-drawn SVG      | mermaid source       | ~90%  |
 | API response          | tree markup + JS    | json surface         | ~88%  |
@@ -153,7 +158,7 @@ pre-styled controls instead of shipping its own, so it still comes out ahead.
 
 ## Run it anywhere
 
-sideshow runs locally as a small Node server, or on Cloudflare Workers when your
+shuvshow runs locally as a small Node server, or on Cloudflare Workers when your
 agent and your browser live on different machines (or you want the viewer on your
 phone). See **[docs/deploying.md](docs/deploying.md)**.
 
@@ -171,7 +176,7 @@ browser, so the action is shown but disabled.
 - **[Deploying to Cloudflare](docs/deploying.md)** — run a shared, tokened
   instance.
 - **[AGENTS.md](AGENTS.md)** — architecture and contributor guide.
-- **Terminal surface (alpha).** [`sideshow-term/`](sideshow-term/) is an early
+- **Terminal surface (alpha).** [`sideshow-term/`](sideshow-term/) is an upstream-compatible early
   sibling that renders to a TUI instead of the browser. APIs are unstable.
 
 ## Development
@@ -195,18 +200,6 @@ the Worker entrypoint is exercised in `workerd` and browser behavior in Playwrig
 neither of which is folded into a misleading Node percentage. See
 [AGENTS.md](AGENTS.md) for the full architecture and rules.
 
-## Sponsor
-
-Sponsored by [Modem](https://modem.dev?utm_source=github&utm_medium=oss&utm_campaign=oss_sideshow&utm_content=readme_footer).
-
-<a href="https://modem.dev?utm_source=github&utm_medium=oss&utm_campaign=oss_sideshow&utm_content=readme_footer">
-  <picture>
-    <source media="(prefers-color-scheme: dark)" srcset="https://modem.dev/images/logo/svg/modem-combined-white.svg">
-    <source media="(prefers-color-scheme: light)" srcset="https://modem.dev/images/logo/svg/modem-combined-black.svg">
-    <img src="https://modem.dev/images/logo/svg/modem-combined-black.svg" alt="Modem" width="220">
-  </picture>
-</a>
-
 ## License
 
-[MIT](LICENSE)
+[MIT](LICENSE). The original copyright notice remains intact.

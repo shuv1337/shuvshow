@@ -1,4 +1,4 @@
-// Shared self-hosted connect flow. Backported from sideshow-cloud's polished
+// Shared self-hosted connect flow. Backported from shuvshow-cloud's polished
 // connect-an-agent screen, but kept generic for local/self-hosted deployments:
 // the URL is the artifact, and the default path is the universal add-mcp installer.
 import { createSignal, For, type JSX } from "solid-js";
@@ -116,7 +116,7 @@ const CLIENTS: Client[] = [
     name: "Most agents",
     logo: LogoMostAgents,
     setup: (url) => <CopyField value={`npx add-mcp ${url}`} />,
-    approve: () => <>Reload your agent if it asks, then ask it to publish a sideshow test post.</>,
+    approve: () => <>Reload your agent if it asks, then ask it to publish a shuvshow test post.</>,
   },
   {
     name: "Pi",
@@ -125,8 +125,8 @@ const CLIENTS: Client[] = [
       const serverUrl = serverUrlFromMcpUrl(url);
       return (
         <>
-          <p class="muted">Install the sideshow extension in Pi:</p>
-          <CopyField value="pi install npm:sideshow" />
+          <p class="muted">Install the shuvshow extension in Pi:</p>
+          <CopyField value="pi install npm:shuvshow" />
           <p class="muted">Then point it at this server:</p>
           <CopyField value={`export SIDESHOW_URL=${serverUrl}`} />
           <p class="muted">
@@ -138,7 +138,7 @@ const CLIENTS: Client[] = [
     },
     approve: () => (
       <>
-        <code>/sideshow</code> in Pi confirms the extension can reach this server.
+        <code>/shuvshow</code> in Pi confirms the extension can reach this server.
       </>
     ),
   },
@@ -148,7 +148,7 @@ const CLIENTS: Client[] = [
     setup: (url) => (
       <>
         <p class="muted">Most MCP clients accept a generic HTTP server entry:</p>
-        <CopyField value={JSON.stringify({ mcpServers: { sideshow: { url } } }, null, 2)} />
+        <CopyField value={JSON.stringify({ mcpServers: { shuvshow: { url } } }, null, 2)} />
       </>
     ),
   },

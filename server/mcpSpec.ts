@@ -2,6 +2,7 @@ import { z } from "zod";
 import { KIT_IDS } from "./kits.ts";
 import { SURFACE_KINDS, type SurfaceKind } from "./types.ts";
 
+// Retained as a compatibility identifier for existing MCP client registrations.
 export const MCP_SERVER_INFO = { name: "sideshow", version: "0.1.0" };
 
 // The `kind` enum both MCP transports advertise — derived from the one canonical
@@ -10,7 +11,7 @@ export const MCP_SERVER_INFO = { name: "sideshow", version: "0.1.0" };
 const PART_KIND_ENUM = [...SURFACE_KINDS] as [SurfaceKind, ...SurfaceKind[]];
 
 export const MCP_INSTRUCTIONS =
-  "Use Sideshow for diagrams, UI sketches, data, and code review. Publish with publish_post; " +
+  "Use shuvshow for diagrams, UI sketches, data, and code review. Publish with publish_post; " +
   "revise with update_post. Set sessionTitle to the task name on first publish. Read userFeedback " +
   "in write/reply results; comments are delivered once. Use wait_for_feedback when you need a " +
   "reaction. Fetch get_design_guide only for html. Use send_test_post to test a connection or fresh workspace.";

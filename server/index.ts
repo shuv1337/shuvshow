@@ -49,13 +49,13 @@ const dbPath = process.env.SIDESHOW_DB ?? `${jsonPath.replace(/\.json$/, "")}.db
 // SIDESHOW_DATA or SIDESHOW_DB is managing their own location.
 if (!process.env.SIDESHOW_DATA && !process.env.SIDESHOW_DB) {
   if (migrateLegacyDataDir(join(root, "data"), dataDir)) {
-    console.log(`[sideshow] migrated existing data from ${join(root, "data")} to ${dataDir}`);
+    console.log(`[shuvshow] migrated existing data from ${join(root, "data")} to ${dataDir}`);
   }
 }
 let store: Store;
 if (process.env.SIDESHOW_STORE === "json") {
   store = new JsonFileStore(jsonPath);
-  console.log(`sideshow store: JSON file at ${jsonPath}`);
+  console.log(`shuvshow store: JSON file at ${jsonPath}`);
 } else {
   const sqlite = new SqlStore(createSqliteStorage(dbPath));
   // First SQLite boot with a legacy JSON file present copies it in once.
@@ -64,7 +64,7 @@ if (process.env.SIDESHOW_STORE === "json") {
   // Announce the backend so an existing SIDESHOW_DATA deploy isn't surprised by
   // the silent switch to SQLite (set SIDESHOW_STORE=json to keep the old store).
   console.log(
-    `sideshow store: SQLite at ${dbPath} (SIDESHOW_STORE=json for the legacy JSON store)`,
+    `shuvshow store: SQLite at ${dbPath} (SIDESHOW_STORE=json for the legacy JSON store)`,
   );
 }
 
@@ -79,11 +79,11 @@ const app = createApp({
   // SIDESHOW_VERSION fakes the running version (manual testing of the
   // notice); set it to the empty string to disable the update check
   version: process.env.SIDESHOW_VERSION ?? (JSON.parse(pkgJson) as { version: string }).version,
-  upgradeCommand: "npm install -g sideshow",
+  upgradeCommand: "npm install -g shuvshow",
 });
 
 const port = Number(process.env.PORT ?? 8228);
 
 serve({ fetch: app.fetch, port }, (info) => {
-  console.log(`sideshow listening on http://localhost:${info.port}`);
+  console.log(`shuvshow listening on http://localhost:${info.port}`);
 });

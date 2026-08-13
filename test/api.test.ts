@@ -319,11 +319,8 @@ test("GET /s/:id serves the viewer shell with link-preview metadata", async () =
   assert.match(body, /<title>Auth Flow<\/title>/);
   assert.match(body, /<meta property="og:title" content="Auth Flow">/);
   assert.match(body, /<meta name="twitter:title" content="Auth Flow">/);
-  assert.match(body, /<meta property="og:description" content="A https:\/\/sideshow\.sh surface">/);
-  assert.match(
-    body,
-    /<meta name="twitter:description" content="A https:\/\/sideshow\.sh surface">/,
-  );
+  assert.match(body, /<meta property="og:description" content="A shuvshow surface">/);
+  assert.match(body, /<meta name="twitter:description" content="A shuvshow surface">/);
   assert.doesNotMatch(body, /Secret session/);
 });
 
@@ -348,7 +345,7 @@ test("GET /session/:id serves the viewer shell with the session title", async ()
   assert.match(aliased.headers.get("content-security-policy") ?? "", /frame-ancestors 'self'/);
   const body = await page.text();
   assert.ok(body.includes("viewer"), "should serve the trusted viewer shell");
-  assert.match(body, /<title>Auth refactor · sideshow<\/title>/);
+  assert.match(body, /<title>Auth refactor · shuvshow<\/title>/);
 });
 
 test("GET /s/:id emits absolute token-free canonical and preview image URLs", async () => {

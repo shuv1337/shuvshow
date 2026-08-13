@@ -6,7 +6,7 @@ machine than the browser, or you want the viewer on your phone.
 ```sh
 npx wrangler login
 npx wrangler secret put SIDESHOW_TOKEN   # any long random string
-npm run deploy                           # https://sideshow.<account>.workers.dev
+npm run deploy                           # https://shuvshow.<account>.workers.dev
 ```
 
 A deployed instance requires the token on every request. Open the viewer once as
@@ -14,7 +14,7 @@ A deployed instance requires the token on every request. Open the viewer once as
 and stdio MCP pick them up automatically:
 
 ```sh
-export SIDESHOW_URL=https://sideshow.<account>.workers.dev
+export SIDESHOW_URL=https://shuvshow.<account>.workers.dev
 export SIDESHOW_TOKEN=<token>
 ```
 
@@ -40,7 +40,7 @@ from `wrangler.jsonc` on deployed Workers.
 Remote agents can connect MCP straight to the deployment:
 
 ```sh
-claude mcp add --transport http sideshow https://sideshow.<account>.workers.dev/mcp \
+claude mcp add --transport http shuvshow https://shuvshow.<account>.workers.dev/mcp \
   --header "Authorization: Bearer $SIDESHOW_TOKEN"
 ```
 

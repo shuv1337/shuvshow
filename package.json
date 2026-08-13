@@ -1,7 +1,7 @@
 {
-  "name": "sideshow",
+  "name": "shuvshow",
   "version": "0.13.0",
-  "description": "A live visual surface for terminal coding agents — agents draw HTML snippets, you watch them in the browser and comment back.",
+  "description": "A live visual surface for terminal coding agents — agents publish visual posts, you watch them in the browser and comment back.",
   "keywords": [
     "agent-tools",
     "ai-agents",
@@ -12,18 +12,21 @@
     "pi-package",
     "visualization"
   ],
-  "homepage": "https://github.com/modem-dev/sideshow#readme",
+  "homepage": "https://github.com/shuv1337/shuvshow#readme",
   "bugs": {
-    "url": "https://github.com/modem-dev/sideshow/issues"
+    "url": "https://github.com/shuv1337/shuvshow/issues"
   },
   "license": "MIT",
-  "author": "Ben Vinegar",
+  "author": "shuv1337",
+  "contributors": [
+    "Ben Vinegar (original author)"
+  ],
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/modem-dev/sideshow.git"
+    "url": "git+https://github.com/shuv1337/shuvshow.git"
   },
   "bin": {
-    "sideshow": "bin/sideshow.js"
+    "shuvshow": "bin/sideshow.js"
   },
   "files": [
     "bin/",
@@ -82,6 +85,7 @@
     "format:check": "oxfmt --check .",
     "lint": "oxlint . --deny-warnings",
     "lint:fix": "oxlint . --fix",
+    "brand:check": "node scripts/check-fork-boundaries.ts",
     "changeset": "changeset",
     "changeset:status": "changeset status",
     "release:version": "changeset version",
