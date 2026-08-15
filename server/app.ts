@@ -862,8 +862,14 @@ export function createApp({
 
   // --- pages and docs ---
 
-  const withOrigin = (text: string, c: { req: { url: string } }) =>
-    text.replaceAll(LOCAL_ORIGIN, new URL(c.req.url).origin);
+  const withOrigin = (text: string, request: Request) => {
+    const url = new URL(request.url);
+    const forwardedProto = request.headers.get("x-forwarded-proto");
+    if (forwardedProto === "http" || forwardedProto === "https") {
+      url.protocol = `${forwardedProto}:`;
+    }
+    return text.replaceAll(LOCAL_ORIGIN, url.origin);
+  };
 
   const injectHead = (text: string, head: string) => {
     const headClose = text.lastIndexOf("</head>");
@@ -942,7 +948,7 @@ export function createApp({
     const pageTitle = opts.post?.title ?? opts.title;
     const html = withDocumentTitle(
       withViewerConfig(
-        withOrigin(viewerHtml, { req: { url: c.req.url } }),
+        withOrigin(viewerHtml, c.req.raw),
         c.req.raw,
         !!publicRead && !isAuthenticated(c),
         pageTitle,
@@ -973,9 +979,9 @@ export function createApp({
   };
   app.get("/session/:id/s/:surfaceId", sessionPostPage); // legacy alias
   app.get("/session/:id/p/:postId", sessionPostPage);
-  app.get("/guide", (c) => c.text(withOrigin(guideMarkdown, c)));
-  app.get("/setup", (c) => c.text(withOrigin(setupText, c)));
-  app.get("/agent-howto", (c) => c.text(withOrigin(agentHowtoText, c)));
+  app.get("/guide", (c) => c.text(withOrigin(guideMarkdown, c.req.raw)));
+  app.get("/setup", (c) => c.text(withOrigin(setupText, c.req.raw)));
+  app.get("/agent-howto", (c) => c.text(withOrigin(agentHowtoText, c.req.raw)));
 
   // Opt-in html kits available on this workspace (id, label, summary, classes) —
   // for discovery (`sideshow kits`); the CSS/JS payloads are server-only.

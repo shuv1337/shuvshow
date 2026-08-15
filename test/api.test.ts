@@ -15,6 +15,7 @@ function makeApp(
     viewerHtml?: string;
     screenshots?: boolean;
     maxHoldConnections?: number;
+    setupText?: string;
     onEvent?: Parameters<typeof createApp>[0]["onEvent"];
     store?: Store;
   },
@@ -1142,6 +1143,15 @@ test("auth hook can guard an embedding host without authToken", async () => {
   assert.equal((await app.request("/api/sessions")).status, 401);
   const allowed = await app.request("/api/sessions", { headers: { "x-sideshow-internal": "ok" } });
   assert.equal(allowed.status, 200);
+});
+
+test("setup instructions preserve the HTTPS origin behind a proxy", async () => {
+  const app = makeApp(undefined, { setupText: "Open http://localhost:8228/setup" });
+  const res = await app.request("http://shuvdev.example:8228/setup", {
+    headers: { "x-forwarded-proto": "https" },
+  });
+
+  assert.equal(await res.text(), "Open https://shuvdev.example:8228/setup");
 });
 
 test("auth token guards mutating routes when configured", async () => {
